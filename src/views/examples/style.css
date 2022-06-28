@@ -1,0 +1,5 @@
+.ant-modal-content {
+    height: 80vh;
+    width: 100%;
+    overflow-x: hidden;
+}

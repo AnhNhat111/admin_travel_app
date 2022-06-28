@@ -17,8 +17,10 @@
 */
 import Index from "views/Index.js";
 import Profile from "views/examples/Profile.js";
-import ProductManagement from "views/examples/ProductManagement";
-import Login from "views/examples/Login";
+import TourManagement from "views/examples/TourManagement";
+import UserManagement from "views/examples/UserManagement";
+import LocationManagement from "views/examples/LocationManagement";
+import VehicleManagement from "views/examples/VehicleManagement";
 
 var routes = [
   {
@@ -36,33 +38,32 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/UserManagement",
-    name: "User Management",
-    icon: "ni ni-planet text-blue",
-    component: ProductManagement,
-    layout: "/admin",
-  },
-  {
-    path: "/product-management",
-    name: "Product Management",
-    icon: "ni ni-pin-3 text-orange",
-    component: ProductManagement,
-    layout: "/admin",
-  },
-  {
-    path: "/TourManagement",
+    path: "/tour-management",
     name: "Tour Management",
-    icon: "ni ni-bullet-list-67 text-red",
-    component: ProductManagement,
+    icon: "ni ni-pin-3 text-orange",
+    component: TourManagement,
     layout: "/admin",
   },
   {
-    path: "/login",
-    name: "Login",
-    icon: "ni ni-key-25 text-info",
-    component: Login,
-    layout: "/auth",
+    path: "/user-management",
+    name: "User Management",
+    icon: "ni ni-pin-3 text-orange",
+    component: UserManagement,
+    layout: "/admin",
   },
-
+  {
+    path: "/vehicle-management",
+    name: "Vehicle Management",
+    icon: "ni ni-pin-3 text-orange",
+    component: VehicleManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/location-management",
+    name: "Location Management",
+    icon: "ni ni-pin-3 text-orange",
+    component: LocationManagement,
+    layout: "/admin",
+  },
 ];
 export default routes;
