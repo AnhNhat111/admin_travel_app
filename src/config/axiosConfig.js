@@ -6,15 +6,15 @@ const instance = axios.create({
 
 instance.defaults.headers.common["Content-Type"] = "application/json";
 instance.defaults.headers.common["Accept"] = "application/json";
-instance.defaults.headers.common["Authorization"] =
-  "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZGFlNWQ2MWQ4YzcxYWQ0MmJkNjI4YjNhYTJjMDE4MjZlNzg0MzY1ODI5NTU0YzgyY2YzZDg2MGNhMWQ1NjI4NTVjOTU5NGI3NjFiZjJmOGIiLCJpYXQiOjE2NTYyNjQ0NTAuOTEyMDExLCJuYmYiOjE2NTYyNjQ0NTAuOTEyMDE0LCJleHAiOjE2ODc4MDA0NTAuOTA4NjI5LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.H71K9fsE4iql5OG_gFaUoaJ635C7Und1CHz-1H-UPiq_1qpWBQns8WCjGW6V-TXyq4KpRQ0lkXyvH89A7He0k_AR4cJ-WH9bTifuYGY_nZdMr11LLeJ9TkKfuEAEZJ8GnTLcexgIJuqe0ruq2Hkpx9RrifeHeUELCdjb6NnqnzlM_0WePM5v6vDL8Rcw3JH1NSxumr06h9-wvHj3x7BJIuv5085G-oG_cLZdZNmpXBO8lsUQagrbkSfl0Ga3-2Blp5AgYlqJq8GQZza7HlvY2VsBN3IFkf2jlGObU2RYl5sOt0OjjOPS-OUUXZ-Y8o8W-dNAzd92ZYBZ-pHYla0B0wv86lpL26SjiMNGY7zO88y5EEWF4yYpu5S6FIQwqHzBYhnyK-b_1GSXcjMFFSYWCrHjPQ8EcArcGtzEJvtJ9__suW_h3k0QGwEsFaZVXoQ-NFlsj9X8X-nv0xysnzzou8Ye-VGWnnoagZn5pEMX9zSmqFTICKThh-eKLbxObpmCWirUBKxiKNoYmdBY4O3Fhd0yVg6LkvniUUUd1b3HUrbsaFfOUMQTVWpR7z6bpszzs_Lj9l7sdbG4mfLoGRk3Ps4SpnAaDciLThO3unfeenZb5T8SOkX-HgizNtUWKXMQQxNbsX0FmRIUYCZexU7wqeHqKjVtkexn71KMIHHLRF4";
+// instance.defaults.headers.common["Authorization"] =
 
-// axios.interceptors.request.use((config) => {
-//   console.log(config);
-//   config.headers.common["Authorization"] =
-//     "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiODdkNTI0MzljNTI3ODM4NTkwNGJiNWRiNjZjMTYyMzUyOGI4NDE0NzM3YTkzNmMwZTYwMzhmNmU3NjdjZTk2M2Y3OWRlYzg2NTAwYzg3ZjciLCJpYXQiOjE2NTYyNjQwOTIuMDkzNzI1LCJuYmYiOjE2NTYyNjQwOTIuMDkzNzI3LCJleHAiOjE2ODc4MDAwOTIuMDg1MTA1LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.bWR6sFcDQGTsWLLqacHEpRTuNTUeqoYtVS5scV4U2Tlr6dFv0exdMHrUVXczyoFyMlKU5HjTVrYr5pvKm7adyki8owYiFaMnfIULOlQAqDK92opf3M9x0r-YRHO26RuGBoruOMBEO0gVob7OlQgwgwB--NuQIhhFP9vxORmPCk5Hn12H858VQmCwVK3_yYVtcCtbNuoc2gEYQeAzTO12SsvL1AvXL5_pHDEDMsdodo3_fmNndH5hWS8aE2CYPKQ6Er-bI-JiY0zisKv_Q4xRJknw8ozD48BB29fxAm6d-1kqwVwNWAplhZ_iDS6M1Bo_UFdRU_y8C-R4_XSti3B9Lv3dfV0sBE0rEAMxTxXBxcQi7iuFg_PPtOJjp61prIQfq8JO2Q8X25F_PU7bXfVSU-jm811dfyY4xh2Q4j3kpvglhaD8VuizqKr0vem-MkLFNYHKo3zQxFz7R9OIJ7EoCnNNvRavkl8tYScS40NLxnIag6_hbzlntqwHXZ4c9UO1aeo9W_IYsJ7p27DyJHzvmjq0RrAu2iRUY9LNAvYYCN-rmELQHeEVegK6-KGFAYtvqPmloajXOZXt6Ka1rQj38zjnvqhx4bXY3hKUyhiB2bCZeH8hCeKJeRE_Spfup6rssK3Ponqm8b7hiHbNgN30J9Aq8Bf_6IS18B2HBWTm2-8";
+instance.interceptors.request.use((config) => {
+  const token = sessionStorage.getItem("access_token");
+  if (token) {
+    config.headers.common["Authorization"] = `Bearer ${token}`;
+  }
 
-//   return config;
-// });
+  return config;
+});
 
 export default instance;

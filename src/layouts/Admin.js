@@ -15,8 +15,14 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
-import { useLocation, Route, Switch, Redirect } from "react-router-dom";
+import React, { useEffect } from "react";
+import {
+  useLocation,
+  Route,
+  Switch,
+  Redirect,
+  useHistory,
+} from "react-router-dom";
 // reactstrap components
 import { Container } from "reactstrap";
 // core components
@@ -25,8 +31,17 @@ import AdminFooter from "components/Footers/AdminFooter.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
 
 import routes from "routes.js";
+import { validToken } from "../helpers/index";
 
 const Admin = (props) => {
+  const history = useHistory();
+
+  useEffect(() => {
+    if (validToken()) {
+      history.push("/auth/login");
+    }
+  }, []);
+
   const mainContent = React.useRef(null);
   const location = useLocation();
 

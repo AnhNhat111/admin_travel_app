@@ -23,17 +23,11 @@ import { PropTypes } from "prop-types";
 
 // reactstrap components
 import {
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
   Collapse,
   DropdownMenu,
   DropdownItem,
   UncontrolledDropdown,
   DropdownToggle,
-  FormGroup,
   Form,
   Input,
   InputGroupAddon,
@@ -45,8 +39,6 @@ import {
   NavItem,
   NavLink,
   Nav,
-  Progress,
-  Table,
   Container,
   Row,
   Col,
@@ -79,7 +71,7 @@ const Sidebar = (props) => {
             onClick={closeCollapse}
             activeClassName="active"
           >
-            <i className={prop.icon} />
+            {prop.customIcon ? prop.icon : <i className={prop.icon} />}
             {prop.name}
           </NavLink>
         </NavItem>

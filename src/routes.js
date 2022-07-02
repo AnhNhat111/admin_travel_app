@@ -16,32 +16,40 @@
 
 */
 import Index from "views/Index.js";
-import Profile from "views/examples/Profile.js";
 import TourManagement from "views/examples/TourManagement";
 import UserManagement from "views/examples/UserManagement";
 import LocationManagement from "views/examples/LocationManagement";
 import VehicleManagement from "views/examples/VehicleManagement";
-
+import BookingManagement from "views/examples/BookingManagement";
+import Login from "./views/examples/Login";
+import { IoAirplaneOutline } from "react-icons/io5";
 var routes = [
   {
     path: "/index",
     name: "Dashboard",
-    icon: "ni ni-tv-2 text-primary",
+    icon: <IoAirplaneOutline />,
     component: Index,
     layout: "/admin",
+    customIcon: true,
   },
   {
-    path: "/user-profile",
-    name: "User Profile",
-    icon: "ni ni-single-02 text-yellow",
-    component: Profile,
-    layout: "/admin",
+    path: "/login",
+    component: Login,
+    layout: "/auth",
   },
+
   {
     path: "/tour-management",
     name: "Tour Management",
     icon: "ni ni-pin-3 text-orange",
     component: TourManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/booking-management",
+    name: "Booking Management",
+    icon: "ni ni-pin-3 text-orange",
+    component: BookingManagement,
     layout: "/admin",
   },
   {

@@ -17,8 +17,8 @@
 */
 
 // reactstrap components
-import React from 'react'
-import { useHistory } from 'react-router-dom';
+import React from "react";
+import { useHistory } from "react-router-dom";
 import {
   Button,
   Card,
@@ -32,69 +32,66 @@ import {
   InputGroup,
   Row,
   Col,
-  Spinner
-} from "reactstrap"; 
+  Spinner,
+} from "reactstrap";
 const Login = () => {
   const history = useHistory();
   const [loginInputs, setLoginInputs] = React.useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     remember_me: false,
-  })
-  const [loading, setLoading] = React.useState(false)
+  });
+  const [loading, setLoading] = React.useState(false);
 
-  React.useEffect(() => {
-    if(localStorage.getItem("access_token")) history.push('/admin/index')
-  }, [])
+  // React.useEffect(() => {
+  //   if (sessionStorage.getItem("access_token")) history.push("/admin/index");
+  // }, []);
 
   const onLogin = async () => {
-   try {
-    setLoading(true)
-    const url_login = "http://127.0.0.1:8000/api/auth/login"
-    const { email, password, remember_me } = loginInputs;
-    const loginBodyData = {
-      email,
-      password,
-      admin: 1,
-      method_login: 1,
-      remember_me
+    try {
+      setLoading(true);
+      const url_login = "http://127.0.0.1:8000/api/auth/login";
+      const { email, password, remember_me } = loginInputs;
+      const loginBodyData = {
+        email,
+        password,
+        admin: 1,
+        method_login: 1,
+        remember_me,
+      };
+      const resJson = await fetch(url_login, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginBodyData),
+      });
+      const data = await resJson.json();
+      sessionStorage.setItem("access_token", data.access_token);
+      history.push("/admin/index");
+    } catch (e) {
+      alert("Loi dang nhap");
+    } finally {
+      setLoading(false);
     }
-    const resJson = await fetch(url_login, {
-      method: 'post',
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginBodyData)
-    })
-    const data = await resJson.json();
-    localStorage.setItem("access_token",data.access_token)
-    history.push('/admin/index')
-   } catch(e) {
-    alert("Loi dang nhap")
-   } finally {
-    setLoading(false)
-   }
-  }
+  };
 
   return (
     <>
       <Col lg="5" md="7">
         <Card className="bg-secondary shadow border-0">
-          <CardHeader className="bg-transparent pb-5">
+          {/* <CardHeader className="bg-transparent pb-5">
             <div className="text-muted text-center mt-2 mb-3">
-            <Button
+              <Button
                 className="btn-neutral btn-icon"
                 color="default"
                 href="#pablo"
                 onClick={(e) => e.preventDefault()}
               >
-                <span className="btn-inner--icon">
-      
-                </span>
+                <span className="btn-inner--icon"></span>
               </Button>
             </div>
             <div className="btn-wrapper text-center">
-        
               <Button
                 className="btn-neutral btn-icon"
                 color="default"
@@ -113,13 +110,13 @@ const Login = () => {
                 <span className="btn-inner--text">Google</span>
               </Button>
             </div>
-          </CardHeader>
+          </CardHeader> */}
           <CardBody className="px-lg-5 py-lg-5">
             <div className="text-center text-muted mb-4">
-              <small>Or sign in with credentials</small>
+              <small>Login</small>
             </div>
             <Form role="form">
-              <FormGroup className="mb-3"> 
+              <FormGroup className="mb-3">
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
                     <InputGroupText>
@@ -131,7 +128,9 @@ const Login = () => {
                     type="email"
                     autoComplete="new-email"
                     value={loginInputs.email}
-                    onChange={(e) => setLoginInputs({...loginInputs, email: e.target.value})}
+                    onChange={(e) =>
+                      setLoginInputs({ ...loginInputs, email: e.target.value })
+                    }
                   />
                 </InputGroup>
               </FormGroup>
@@ -147,7 +146,12 @@ const Login = () => {
                     type="password"
                     autoComplete="new-password"
                     value={loginInputs.password}
-                    onChange={(e) => setLoginInputs({...loginInputs, password: e.target.value})}
+                    onChange={(e) =>
+                      setLoginInputs({
+                        ...loginInputs,
+                        password: e.target.value,
+                      })
+                    }
                   />
                 </InputGroup>
               </FormGroup>
@@ -157,7 +161,12 @@ const Login = () => {
                   id=" customCheckLogin"
                   type="checkbox"
                   checked={loginInputs.remember_me}
-                  onChange={(e) => setLoginInputs({...loginInputs, remember_me: !loginInputs.remember_me})}
+                  onChange={(e) =>
+                    setLoginInputs({
+                      ...loginInputs,
+                      remember_me: !loginInputs.remember_me,
+                    })
+                  }
                 />
                 <label
                   className="custom-control-label"
@@ -167,8 +176,13 @@ const Login = () => {
                 </label>
               </div>
               <div className="text-center">
-                <Button className="my-4" color="primary" type="button"  onClick={onLogin}>
-                 {loading ? <Spinner/> : "Sign in"}
+                <Button
+                  className="my-4"
+                  color="primary"
+                  type="button"
+                  onClick={onLogin}
+                >
+                  {loading ? <Spinner /> : "Sign in"}
                 </Button>
               </div>
             </Form>
@@ -190,7 +204,6 @@ const Login = () => {
               href="#pablo"
               onClick={(e) => {
                 e.preventDefault();
-                
               }}
             >
               <small>Create new account</small>

@@ -25,10 +25,6 @@ import "assets/scss/argon-dashboard-react.scss";
 
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
-import { chartExample1 } from "variables/charts";
-import { ImportsNotUsedAsValues } from "typescript";
-import { normalizeUnits } from "moment";
-
 
 ReactDOM.render(
   <BrowserRouter>

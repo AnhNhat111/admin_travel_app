@@ -28,7 +28,7 @@ const Tables = () => {
 
   const loadData = async () => {
     axios
-      .get("/admin/vehicle")
+      .get("api/auth/vehicle")
       .then((res) => {
         console.log(res);
         setTours(res.data);

@@ -35,10 +35,10 @@ import axios from "../../config/axiosConfig";
 import moment from "moment";
 import { Option } from "antd/lib/mentions";
 const Tables = () => {
-  const [tours, setTours] = useState([]);
+  const [bookings, setBooking] = useState([]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [TourSeletedId, setTourSeletedId] = useState(null);
+  const [BookingSeletedId, setBookingSeletedId] = useState(null);
 
   const [isTourVisible, setTourVisible] = useState(false);
 
@@ -54,7 +54,7 @@ const Tables = () => {
   const [placement, SetPlacement] = useState("topLeft");
 
   const showModal = (id) => {
-    setTourSeletedId(id);
+    BookingSeletedId(id);
     setIsModalVisible(true);
   };
 
@@ -100,10 +100,10 @@ const Tables = () => {
 
   const loadData = async () => {
     axios
-      .get("/api/auth/user-tour")
+      .get("/api/auth/booking-tour-admin")
       .then((res) => {
-        console.log(res.data.data);
-        setTours(res.data.data);
+        console.log(res);
+        setBooking(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -112,12 +112,12 @@ const Tables = () => {
 
   const gotopages = async () => {
     axios
-      .get(`/api/auth/user-tour`, {
+      .get(`/api/auth/booking-admin-tour`, {
         params: {
           currentPage,
         },
       })
-      .then((response) => setTours(response.data?.data))
+      .then((response) => setBooking(response.data?.data))
       .catch((err) => console.warn(err));
   };
 
@@ -177,129 +177,26 @@ const Tables = () => {
                 <thead className="thead-light">
                   <tr>
                     <th scope="col">STT</th>
-                    <th scope="col">Code</th>
                     <th scope="col">Name</th>
-                    <th scope="col">Price child</th>
-                    <th scope="col">Price adult</th>
-                    <th scope="col">start loaction</th>
-                    <th scope="col">end loaction</th>
-                    <th scope="col">Available</th>
+                    <th scope="col">Tour</th>
+                    <th scope="col">Quantity adult</th>
+                    <th scope="col">Quantity child</th>
+                    <th scope="col">Total quantity</th>
+                    <th scope="col">unit price child</th>
+                    <th scope="col">unit price adult</th>
+                    <th scope="col">total price</th>
+                    <th scope="col">confirm</th>
+                    <th scope="col">Date booking</th>
+                    <th scope="col">Date payment</th>
+                    <th scope="col">Paid</th>
+
                     <th scope="col">Status</th>
-                    <th>
-                      <Button
-                        className="btn-add"
-                        type="primary"
-                        onClick={showModalAdd}
-                      >
-                        Add Tour
-                      </Button>
-                      <Modal
-                        title="ADD"
-                        visible={isTourVisible}
-                        onOk={handleOk}
-                        onCancel={() => setTourVisible(false)}
-                      >
-                        <form>
-                          <label className="label"> name</label>
-                          <Input placeholder="tour" />
-
-                          <label className="label">hotel</label>
-                          <Input placeholder="hotel" />
-
-                          <label className="label">schedule</label>
-                          <Input placeholder="schedule" />
-
-                          <label className="label">price child</label>
-                          <Input placeholder="price child" />
-
-                          <label className="label">price_adult</label>
-                          <Input placeholder="price adlut" />
-
-                          <label className="label">vehicle</label>
-                          <Input placeholder="vehicle" />
-
-                          <label className="label">capacity</label>
-                          <Input placeholder="capacity" />
-
-                          <label className="label">description</label>
-                          <Input placeholder="description" />
-
-                          <label className="label">available capacity </label>
-                          <Input placeholder="available capacity	" />
-
-                          <label className="label">location start</label>
-                          <br />
-
-                          <Col flex="0 1 300px">
-                            <Select
-                              defaultValue="Choose"
-                              style={{ width: 120 }}
-                              onChange={handleChange}
-                            >
-                              <Option value="jack">Jack</Option>
-                              <Option value="lucy">Lucy</Option>
-                            </Select>
-                          </Col>
-
-                          <label className="label">location start</label>
-                          <br />
-
-                          <Col flex="1 1 100px">
-                            <Select
-                              defaultValue="Choose"
-                              style={{ width: 120 }}
-                              onChange={handleChange}
-                            >
-                              <Option value="jack">Jack</Option>
-                              <Option value="lucy">Lucy</Option>
-                            </Select>
-                          </Col>
-
-                          <br />
-                          <label className="label">Date to</label>
-                          <br />
-                          <Space direction="vertical" size={12}>
-                            <RangePicker
-                              dateRender={(current) => {
-                                const style = {};
-
-                                if (current.date() === 1) {
-                                  style.border = "1px solid #1890ff";
-                                  style.borderRadius = "50%";
-                                }
-
-                                return (
-                                  <div
-                                    className="ant-picker-cell-inner"
-                                    style={style}
-                                  >
-                                    {current.date()}
-                                  </div>
-                                );
-                              }}
-                            />
-                          </Space>
-                          <br />
-                          <br />
-                          <label
-                            className="label"
-                            style={{ marginBottom: "10px" }}
-                          >
-                            Status
-                          </label>
-                          <br />
-                          <Radio.Group onChange={onChange} value={value}>
-                            <Radio value={1}>Active</Radio>
-                            <Radio value={2}>Not Active</Radio>
-                          </Radio.Group>
-                        </form>
-                      </Modal>
-                    </th>
+                    <th className="UD">UD</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {tours &&
-                    tours?.map((tour, index) => {
+                  {bookings &&
+                    bookings?.map((bookings, index) => {
                       return (
                         <tr>
                           <th scope="row">
@@ -309,20 +206,27 @@ const Tables = () => {
                               </span>
                             </Media>
                           </th>
-                          <td>{tour.code}</td>
-                          <td>{tour.name}</td>
-                          <td>{tour.price_child}</td>
-                          <td>{tour.price_adult}</td>
-                          <td>{tour.start_location.name}</td>
-                          <td>{tour.end_location.name}</td>
-                          <td>{tour.available_capacity}</td>
-                          <td>{tour.status === 1 ? "active" : "not active"}</td>
-                          <td className="btn-update">
+                          <td>{bookings.user.name}</td>
+                          <td>{bookings.tour.name}</td>
+                          <td>{bookings.quantity_adult}</td>
+                          <td>{bookings.quantity_child}</td>
+                          <td>{bookings.quantity}</td>
+                          <td>{bookings.unit_price_child}</td>
+                          <td>{bookings.unit_price_adult}</td>
+                          <td>{bookings.unit_price_child}</td>
+                          <td>{bookings.total_price}</td>
+                          <td>{bookings.is_confirm}</td>
+                          <td>{bookings.date_of_booking}</td>
+                          <td>{bookings.date_of_payment}</td>
+                          <td>
+                            {bookings.status === 1 ? "active" : "not active"}
+                          </td>
+                          <td className="btn-update-booking">
                             <Button
                               style={{ marginRight: "10px" }}
                               className="btn-modal"
                               type="primary"
-                              onClick={() => showModal(tour.id)}
+                              onClick={() => showModal(bookings.id)}
                             >
                               Update
                             </Button>
@@ -416,7 +320,7 @@ const Tables = () => {
           onCancel={handleCancel}
         >
           <div className="scroll-wrap">
-            {TourSeletedId && (
+            {BookingSeletedId && (
               <form>
                 <Row>
                   <Col span={10} style={{ margin: "18px" }}>
@@ -424,7 +328,7 @@ const Tables = () => {
                   </Col>
                   <Col span={10}>
                     <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {tours[TourSeletedId].hotel}
+                      {bookings[BookingSeletedId].hotel}
                     </Label>
                   </Col>
                 </Row>
@@ -435,7 +339,7 @@ const Tables = () => {
                   </Col>
                   <Col span={10}>
                     <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {tours[TourSeletedId].schedule}
+                      {bookings[BookingSeletedId].schedule}
                     </Label>
                   </Col>
                 </Row>
@@ -446,7 +350,7 @@ const Tables = () => {
                   </Col>
                   <Col span={10}>
                     <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {moment(tours[TourSeletedId].date_to).format(
+                      {moment(bookings[BookingSeletedId].date_to).format(
                         "DD-MM-yyyy"
                       )}
                     </Label>
@@ -459,7 +363,7 @@ const Tables = () => {
                   </Col>
                   <Col span={10}>
                     <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {moment(tours[TourSeletedId].date_from).format(
+                      {moment(bookings[BookingSeletedId].date_from).format(
                         "DD-MM-yyyy"
                       )}
                     </Label>
@@ -485,7 +389,7 @@ const Tables = () => {
                   </Col>
                   <Col span={10}>
                     <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {tours[TourSeletedId].images.map((x) => x.name)}
+                      {bookings[BookingSeletedId].images.map((x) => x.name)}
                     </Label>
                   </Col>
                 </Row>
@@ -496,7 +400,7 @@ const Tables = () => {
                   </Col>
                   <Col span={10}>
                     <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {tours[TourSeletedId].vehicle_id}
+                      {bookings[BookingSeletedId].vehicle_id}
                     </Label>
                   </Col>
                 </Row>
@@ -507,7 +411,7 @@ const Tables = () => {
                   </Col>
                   <Col span={10}>
                     <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {tours[TourSeletedId].capacity}
+                      {bookings[BookingSeletedId].capacity}
                     </Label>
                   </Col>
                 </Row>

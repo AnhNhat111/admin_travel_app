@@ -16,7 +16,7 @@
 
 */
 import { useState, useEffect } from "react";
-import { useHistory } from 'react-router-dom'
+import { useHistory } from "react-router-dom";
 // node.js library that concatenates classes (strings)
 import classnames from "classnames";
 // javascipt plugin for creating charts
@@ -38,7 +38,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
-import { initializeApp } from 'firebase/app'
+import { initializeApp } from "firebase/app";
 // core components
 import {
   chartOptions,
@@ -49,8 +49,6 @@ import {
 
 import Header from "components/Headers/Header.js";
 
-
-
 const Index = (props) => {
   const history = useHistory();
   const [activeNav, setActiveNav] = useState(1);
@@ -58,8 +56,8 @@ const Index = (props) => {
 
   useEffect(() => {
     // khuc nay kiem tra coi co token o localStorage khong (co thi don nghia no da dang nhap) con khong thi no chuyen qua trang login dau !,
-        // if(!localStorage.getItem("access_token")) history.push('/auth/login')
-  }, [])
+    if (!sessionStorage.getItem("access_token")) history.push("/auth/login");
+  }, []);
 
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
