@@ -1,5 +1,6 @@
 import axios from "../config/axiosConfig";
 import { TOKEN_KEY } from "../constants/index";
+import moment from "moment";
 
 export const validToken = () => {
   const token = sessionStorage.getItem(TOKEN_KEY);
@@ -17,4 +18,10 @@ export const validToken = () => {
   }
 
   return false;
+};
+export const formatDate = (val) => {
+  if (val) {
+    return moment(val);
+  }
+  return null;
 };

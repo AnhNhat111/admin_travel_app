@@ -1,12 +1,6 @@
 import {
-  Badge,
   Card,
   CardHeader,
-  CardFooter,
-  DropdownMenu,
-  DropdownItem,
-  UncontrolledDropdown,
-  DropdownToggle,
   Media,
   Pagination,
   PaginationItem,
@@ -20,7 +14,7 @@ import Header from "components/Headers/Header.js";
 import { useEffect, useState } from "react";
 import axios from "../../config/axiosConfig";
 const Tables = () => {
-  const [tours, setTours] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
 
   useEffect(() => {
     loadData();
@@ -31,7 +25,7 @@ const Tables = () => {
       .get("api/auth/vehicle")
       .then((res) => {
         console.log(res);
-        setTours(res.data);
+        setVehicles(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -60,7 +54,7 @@ const Tables = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tours.map((vehicles, index) => {
+                  {vehicles.map((vehicles, index) => {
                     return (
                       <tr>
                         <th scope="row">
@@ -69,7 +63,9 @@ const Tables = () => {
                           </Media>
                         </th>
                         <td>{vehicles.name}</td>
-                        <td>{vehicles.status}</td>
+                        <td>
+                          {vehicles.status === 1 ? "active" : "not active"}
+                        </td>
                       </tr>
                     );
                   })}

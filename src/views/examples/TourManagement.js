@@ -34,13 +34,16 @@ import { useEffect, useState } from "react";
 import axios from "../../config/axiosConfig";
 import moment from "moment";
 import { Option } from "antd/lib/mentions";
+import Admin from "../../layouts/Admin";
+import { data } from "jquery";
+import TourModal from "./TourModal";
 const Tables = () => {
   const [tours, setTours] = useState([]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [TourSeletedId, setTourSeletedId] = useState(null);
+  const [tourSeleted, setTourSeleted] = useState(null);
 
-  const [isTourVisible, setTourVisible] = useState(false);
+  const [isShowNewModal, setShowNewModel] = useState(false);
 
   const [listImage, setListImage] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -54,17 +57,16 @@ const Tables = () => {
   const [placement, SetPlacement] = useState("topLeft");
 
   const showModal = (id) => {
-    setTourSeletedId(id);
+    setTourSeleted(tours.find((x) => x.id == id));
     setIsModalVisible(true);
   };
 
   const showModalAdd = () => {
-    setTourVisible(true);
+    setShowNewModel(true);
   };
 
   const handleOk = () => {
     try {
-      console.log("listImage", listImage);
       listImage.map((file) => {
         const imageRef = ref(storage, `images/${file.name}`);
         uploadBytes(imageRef, file).then((snapshot) => {
@@ -98,11 +100,105 @@ const Tables = () => {
     loadData();
   }, []);
 
+  const formData = () => {
+    console.log(tours);
+    return (
+      <form>
+        <label className="label"> name</label>
+        <Input placeholder="name" value={tourSeleted.name} />
+        <label className="label">price child</label>
+        <Input placeholder="price child" value={tourSeleted.price_child} />
+        <label className="label">price_adult</label>
+        <Input placeholder="price adlut" value={tourSeleted.price_adult} />
+        <label className="label">vehicle</label>
+        <Input
+          placeholder="vehicle"
+          // value={tourSeleted.vehicle.map((item) => item.name)}
+        />
+        <label className="label">capacity</label>
+        <Input placeholder="capacity" value={tourSeleted.capacity} />
+        <label className="label">available capacity </label>
+        <Input
+          placeholder="available capacity"
+          value={tourSeleted.available_capacity}
+        />
+        <label className="label">hotel</label>
+        <Input style={{ height: "150px" }} placeholder="hotel" />
+        <label className="label">schedule</label>
+        <Input style={{ height: "150px" }} placeholder="schedule" />
+        <label className="label">description</label>
+        <Input style={{ height: "150px" }} placeholder="description" />
+        <label className="label">location start</label>
+        <br />
+        <Col flex="0 1 300px">
+          <Select
+            defaultValue="Choose"
+            style={{ width: 120 }}
+            onChange={handleChange}
+          >
+            <Option value="jack">Jack</Option>
+            <Option value="lucy">Lucy</Option>
+          </Select>
+        </Col>
+        <label className="label">location start</label>
+        <br />
+        <Col flex="1 1 100px">
+          <Select
+            defaultValue="Choose"
+            style={{ width: 120 }}
+            onChange={handleChange}
+          >
+            <Option value="jack">Jack</Option>
+            <Option value="lucy">Lucy</Option>
+          </Select>
+        </Col>
+        <br />
+        <label className="label">Date to</label>
+        <br />
+        <Space direction="vertical" size={12}>
+          <RangePicker
+            dateRender={(current) => {
+              const style = {};
+
+              if (current.date() === 1) {
+                style.border = "1px solid #1890ff";
+                style.borderRadius = "50%";
+              }
+
+              return (
+                <div className="ant-picker-cell-inner" style={style}>
+                  {current.date()}
+                </div>
+              );
+            }}
+          />
+        </Space>
+        <br />
+        <br />
+
+        <input type="file" multiple="true" onChange={onFileChange} />
+        {tourSeleted.images.lenght > 0 &&
+          tourSeleted.images.map((item, index) => (
+            <img src={item.image_path} style={{ width: 200, height: 200 }} />
+          ))}
+
+        <br />
+        <label className="label" style={{ marginBottom: "10px" }}>
+          Status
+        </label>
+        <br />
+        <Radio.Group onChange={onChange} value={value}>
+          <Radio value={1}>Active</Radio>
+          <Radio value={2}>Not Active</Radio>
+        </Radio.Group>
+      </form>
+    );
+  };
+
   const loadData = async () => {
     axios
       .get("/api/auth/user-tour")
       .then((res) => {
-        console.log(res.data.data);
         setTours(res.data.data);
       })
       .catch((err) => {
@@ -110,11 +206,26 @@ const Tables = () => {
       });
   };
 
-  const gotopages = async () => {
+  const addData = async () => {
+    axios
+      .post("/api/auth/get-all-user", {
+        firstName: "Fred",
+        lastName: "Flintstone",
+      })
+      .then((res) => {
+        console.log(res);
+        setTours(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const gotopages = async (page) => {
     axios
       .get(`/api/auth/user-tour`, {
         params: {
-          currentPage,
+          page: page,
         },
       })
       .then((response) => setTours(response.data?.data))
@@ -140,8 +251,6 @@ const Tables = () => {
     setListImage(newArr);
   };
 
-  console.log("listImage", listImage);
-
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -157,7 +266,6 @@ const Tables = () => {
 
   const [value, setValue] = useState(1);
   const onChange = (e) => {
-    console.log("radio checked", e.target.value);
     setValue(e.target.value);
   };
 
@@ -189,111 +297,10 @@ const Tables = () => {
                       <Button
                         className="btn-add"
                         type="primary"
-                        onClick={showModalAdd}
+                        onClick={() => showModalAdd()}
                       >
                         Add Tour
                       </Button>
-                      <Modal
-                        title="ADD"
-                        visible={isTourVisible}
-                        onOk={handleOk}
-                        onCancel={() => setTourVisible(false)}
-                      >
-                        <form>
-                          <label className="label"> name</label>
-                          <Input placeholder="tour" />
-
-                          <label className="label">hotel</label>
-                          <Input placeholder="hotel" />
-
-                          <label className="label">schedule</label>
-                          <Input placeholder="schedule" />
-
-                          <label className="label">price child</label>
-                          <Input placeholder="price child" />
-
-                          <label className="label">price_adult</label>
-                          <Input placeholder="price adlut" />
-
-                          <label className="label">vehicle</label>
-                          <Input placeholder="vehicle" />
-
-                          <label className="label">capacity</label>
-                          <Input placeholder="capacity" />
-
-                          <label className="label">description</label>
-                          <Input placeholder="description" />
-
-                          <label className="label">available capacity </label>
-                          <Input placeholder="available capacity	" />
-
-                          <label className="label">location start</label>
-                          <br />
-
-                          <Col flex="0 1 300px">
-                            <Select
-                              defaultValue="Choose"
-                              style={{ width: 120 }}
-                              onChange={handleChange}
-                            >
-                              <Option value="jack">Jack</Option>
-                              <Option value="lucy">Lucy</Option>
-                            </Select>
-                          </Col>
-
-                          <label className="label">location start</label>
-                          <br />
-
-                          <Col flex="1 1 100px">
-                            <Select
-                              defaultValue="Choose"
-                              style={{ width: 120 }}
-                              onChange={handleChange}
-                            >
-                              <Option value="jack">Jack</Option>
-                              <Option value="lucy">Lucy</Option>
-                            </Select>
-                          </Col>
-
-                          <br />
-                          <label className="label">Date to</label>
-                          <br />
-                          <Space direction="vertical" size={12}>
-                            <RangePicker
-                              dateRender={(current) => {
-                                const style = {};
-
-                                if (current.date() === 1) {
-                                  style.border = "1px solid #1890ff";
-                                  style.borderRadius = "50%";
-                                }
-
-                                return (
-                                  <div
-                                    className="ant-picker-cell-inner"
-                                    style={style}
-                                  >
-                                    {current.date()}
-                                  </div>
-                                );
-                              }}
-                            />
-                          </Space>
-                          <br />
-                          <br />
-                          <label
-                            className="label"
-                            style={{ marginBottom: "10px" }}
-                          >
-                            Status
-                          </label>
-                          <br />
-                          <Radio.Group onChange={onChange} value={value}>
-                            <Radio value={1}>Active</Radio>
-                            <Radio value={2}>Not Active</Radio>
-                          </Radio.Group>
-                        </form>
-                      </Modal>
                     </th>
                   </tr>
                 </thead>
@@ -331,7 +338,29 @@ const Tables = () => {
                               style={{ marginRight: "10px" }}
                               className="btn-modal"
                               type="primary"
-                              onClick={() => showModal()}
+                              onClick={() => {
+                                if (
+                                  window.confirm(
+                                    "Are you sure you want to save this thing into the database?"
+                                  )
+                                ) {
+                                  axios
+                                    .delete(`/api/auth/tour/${tour.id}`)
+                                    .then(function (response) {
+                                      loadData();
+
+                                      console.log(response);
+                                    })
+                                    .catch(function (error) {
+                                      console.log(error);
+                                    });
+                                } else {
+                                  // Do nothing!
+                                  console.log(
+                                    "Thing was not saved to the database."
+                                  );
+                                }
+                              }}
                             >
                               Delete
                             </Button>
@@ -364,7 +393,7 @@ const Tables = () => {
                         onClick={(e) => {
                           setCurrentPage(1);
                           e.preventDefault();
-                          gotopages();
+                          gotopages(1);
                         }}
                       >
                         1
@@ -375,7 +404,7 @@ const Tables = () => {
                         href="#pablo"
                         onClick={(e) => {
                           setCurrentPage(2);
-                          gotopages();
+                          gotopages(2);
                           e.preventDefault();
                         }}
                       >
@@ -388,7 +417,7 @@ const Tables = () => {
                         onClick={(e) => {
                           e.preventDefault();
                           setCurrentPage(3);
-                          gotopages();
+                          gotopages(3);
                         }}
                       >
                         3
@@ -410,111 +439,20 @@ const Tables = () => {
           </div>
         </Row>
         <Modal
-          title="Watch"
+          title="Update"
           visible={isModalVisible}
           onOk={handleOk}
           onCancel={handleCancel}
         >
-          <div className="scroll-wrap">
-            {TourSeletedId && (
-              <form>
-                <Row>
-                  <Col span={10} style={{ margin: "18px" }}>
-                    <label>hotel</label>
-                  </Col>
-                  <Col span={10}>
-                    <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {tours[TourSeletedId].hotel}
-                    </Label>
-                  </Col>
-                </Row>
-
-                <Row>
-                  <Col span={10} style={{ margin: "18px" }}>
-                    <label>schedule</label>
-                  </Col>
-                  <Col span={10}>
-                    <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {tours[TourSeletedId].schedule}
-                    </Label>
-                  </Col>
-                </Row>
-
-                <Row>
-                  <Col span={10} style={{ margin: "18px" }}>
-                    <label>date from</label>
-                  </Col>
-                  <Col span={10}>
-                    <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {moment(tours[TourSeletedId].date_to).format(
-                        "DD-MM-yyyy"
-                      )}
-                    </Label>
-                  </Col>
-                </Row>
-
-                <Row>
-                  <Col span={10} style={{ margin: "18px" }}>
-                    <label>date from</label>
-                  </Col>
-                  <Col span={10}>
-                    <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {moment(tours[TourSeletedId].date_from).format(
-                        "DD-MM-yyyy"
-                      )}
-                    </Label>
-                  </Col>
-                </Row>
-
-                <Row>
-                  <Col
-                    span={10}
-                    style={{ margin: "18px", flexDirection: "row" }}
-                  >
-                    <input
-                      type="file"
-                      multiple="true"
-                      onChange={onFileChange}
-                    />
-                    {listImage.map((item, index) => (
-                      <img
-                        src={URL.createObjectURL(item)}
-                        style={{ width: 200, height: 200 }}
-                      />
-                    ))}
-                  </Col>
-                  <Col span={10}>
-                    <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {tours[TourSeletedId].images.map((x) => x.name)}
-                    </Label>
-                  </Col>
-                </Row>
-
-                <Row>
-                  <Col span={10} style={{ margin: "18px" }}>
-                    <label>vehicle</label>
-                  </Col>
-                  <Col span={10}>
-                    <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {tours[TourSeletedId].vehicle_id}
-                    </Label>
-                  </Col>
-                </Row>
-
-                <Row>
-                  <Col span={10} style={{ margin: "18px" }}>
-                    <label>capacity</label>
-                  </Col>
-                  <Col span={10}>
-                    <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {tours[TourSeletedId].capacity}
-                    </Label>
-                  </Col>
-                </Row>
-              </form>
-            )}
-          </div>
+          <div className="">{tourSeleted && formData()}</div>
         </Modal>
+        <TourModal
+          visible={isShowNewModal}
+          setVisible={setShowNewModel}
+          title="ADD"
+          onCancel={() => setShowNewModel()}
+          onOK={(data) => console.log(data)}
+        />
       </Container>
     </>
   );

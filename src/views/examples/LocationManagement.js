@@ -3,12 +3,28 @@ import { Card, CardHeader, Media, Table, Container, Row } from "reactstrap";
 import Header from "components/Headers/Header.js";
 import { useEffect, useState } from "react";
 import axios from "../../config/axiosConfig";
+import { Button, Input, Modal } from "antd";
 const Tables = () => {
   const [locations, setLocations] = useState([]);
+  const [TourSeletedId, setTourSeletedId] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isTourVisible, setTourVisible] = useState(false);
 
+  const showModal = (id) => {
+    setTourSeletedId(id);
+    setIsModalVisible(true);
+  };
+
+  const showModalAdd = () => {
+    setTourVisible(true);
+  };
   useEffect(() => {
     loadData();
   }, []);
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
 
   const loadData = async () => {
     axios
@@ -41,22 +57,48 @@ const Tables = () => {
                     <th scope="col">STT</th>
                     <th scope="col">Name</th>
                     <th scope="col">Status</th>
+                    <th>
+                      <Button
+                        className="btn-add"
+                        type="primary"
+                        onClick={showModalAdd}
+                      >
+                        Add Tour
+                      </Button>
+                      <Modal
+                        title="ADD"
+                        visible={isTourVisible}
+                        onOk={handleOk}
+                        onCancel={() => setTourVisible(false)}
+                      >
+                        <form>
+                          <label className="label">description</label>
+                          <Input placeholder="description" />
+
+                          <label className="label">available capacity </label>
+                          <Input placeholder="available capacity	" />
+                        </form>
+                      </Modal>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {locations.map((locations, index) => {
-                    return (
-                      <tr>
-                        <th scope="row">
-                          <Media>
-                            <span className="mb-0 text-sm">{index + 1}</span>
-                          </Media>
-                        </th>
-                        <td>{locations.name}</td>
-                        <td>{locations.status}</td>
-                      </tr>
-                    );
-                  })}
+                  {locations &&
+                    locations.map((locations, index) => {
+                      return (
+                        <tr>
+                          <th scope="row">
+                            <Media>
+                              <span className="mb-0 text-sm">{index + 1}</span>
+                            </Media>
+                          </th>
+                          <td>{locations.name}</td>
+                          <td>
+                            {locations.status === 1 ? "active" : "not active"}
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </Table>
             </Card>

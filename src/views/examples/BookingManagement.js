@@ -13,17 +13,7 @@ import {
 } from "reactstrap";
 import "antd/dist/antd.css";
 
-import {
-  Button,
-  Modal,
-  Upload,
-  Col,
-  Radio,
-  DatePicker,
-  Input,
-  Space,
-  Select,
-} from "antd";
+import { Button, Modal, Upload, Col, Radio, DatePicker } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import storage from "../../config/firebaseConfig";
 import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
@@ -40,7 +30,7 @@ const Tables = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [BookingSeletedId, setBookingSeletedId] = useState(null);
 
-  const [isTourVisible, setTourVisible] = useState(false);
+  const [isBookingVisible, setBookingVisible] = useState(false);
 
   const [listImage, setListImage] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -54,14 +44,12 @@ const Tables = () => {
   const [placement, SetPlacement] = useState("topLeft");
 
   const showModal = (id) => {
-    BookingSeletedId(id);
+    setBookingSeletedId(id);
     setIsModalVisible(true);
   };
-
   const showModalAdd = () => {
-    setTourVisible(true);
+    setBookingVisible(true);
   };
-
   const handleOk = () => {
     try {
       console.log("listImage", listImage);
@@ -112,12 +100,15 @@ const Tables = () => {
 
   const gotopages = async () => {
     axios
-      .get(`/api/auth/booking-admin-tour`, {
+      .get(`/api/auth/booking-tour-admin`, {
         params: {
           currentPage,
         },
       })
-      .then((response) => setBooking(response.data?.data))
+      .then((response) => {
+        console.log(response.data);
+        setBooking(response.data?.data);
+      })
       .catch((err) => console.warn(err));
   };
 
@@ -139,7 +130,6 @@ const Tables = () => {
     newArr.push(event.target.files[0]);
     setListImage(newArr);
   };
-
   console.log("listImage", listImage);
 
   const uploadButton = (
@@ -154,7 +144,6 @@ const Tables = () => {
       </div>
     </div>
   );
-
   const [value, setValue] = useState(1);
   const onChange = (e) => {
     console.log("radio checked", e.target.value);
@@ -185,18 +174,18 @@ const Tables = () => {
                     <th scope="col">unit price child</th>
                     <th scope="col">unit price adult</th>
                     <th scope="col">total price</th>
-                    <th scope="col">confirm</th>
                     <th scope="col">Date booking</th>
                     <th scope="col">Date payment</th>
                     <th scope="col">Paid</th>
 
+                    <th scope="col">confirm</th>
                     <th scope="col">Status</th>
                     <th className="UD">UD</th>
                   </tr>
                 </thead>
                 <tbody>
                   {bookings &&
-                    bookings?.map((bookings, index) => {
+                    bookings.map((bookings, index) => {
                       return (
                         <tr>
                           <th scope="row">
@@ -207,17 +196,21 @@ const Tables = () => {
                             </Media>
                           </th>
                           <td>{bookings.user.name}</td>
-                          <td>{bookings.tour.name}</td>
+                          <td>{bookings.tour.map((x) => x.name)}</td>
                           <td>{bookings.quantity_adult}</td>
                           <td>{bookings.quantity_child}</td>
                           <td>{bookings.quantity}</td>
                           <td>{bookings.unit_price_child}</td>
                           <td>{bookings.unit_price_adult}</td>
-                          <td>{bookings.unit_price_child}</td>
                           <td>{bookings.total_price}</td>
-                          <td>{bookings.is_confirm}</td>
                           <td>{bookings.date_of_booking}</td>
                           <td>{bookings.date_of_payment}</td>
+                          <td>{bookings.is_paid === 1 ? "paid" : "unpaid"}</td>
+                          <td>
+                            {bookings.is_confirm === 1
+                              ? "confirmed"
+                              : "not confirmed"}
+                          </td>
                           <td>
                             {bookings.status === 1 ? "active" : "not active"}
                           </td>
@@ -235,7 +228,7 @@ const Tables = () => {
                               style={{ marginRight: "10px" }}
                               className="btn-modal"
                               type="primary"
-                              onClick={() => showModal()}
+                              // onClick={() => showModal(bookings.id)}
                             >
                               Delete
                             </Button>
@@ -314,12 +307,12 @@ const Tables = () => {
           </div>
         </Row>
         <Modal
-          title="Watch"
+          title="Update"
           visible={isModalVisible}
           onOk={handleOk}
           onCancel={handleCancel}
         >
-          <div className="scroll-wrap">
+          <div className="">
             {BookingSeletedId && (
               <form>
                 <Row>
@@ -328,7 +321,7 @@ const Tables = () => {
                   </Col>
                   <Col span={10}>
                     <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {bookings[BookingSeletedId].hotel}
+                      {bookings[BookingSeletedId].booking_details}
                     </Label>
                   </Col>
                 </Row>
@@ -366,30 +359,6 @@ const Tables = () => {
                       {moment(bookings[BookingSeletedId].date_from).format(
                         "DD-MM-yyyy"
                       )}
-                    </Label>
-                  </Col>
-                </Row>
-
-                <Row>
-                  <Col
-                    span={10}
-                    style={{ margin: "18px", flexDirection: "row" }}
-                  >
-                    <input
-                      type="file"
-                      multiple="true"
-                      onChange={onFileChange}
-                    />
-                    {listImage.map((item, index) => (
-                      <img
-                        src={URL.createObjectURL(item)}
-                        style={{ width: 200, height: 200 }}
-                      />
-                    ))}
-                  </Col>
-                  <Col span={10}>
-                    <Label placeholder="capacity" style={{ margin: "18px" }}>
-                      {bookings[BookingSeletedId].images.map((x) => x.name)}
                     </Label>
                   </Col>
                 </Row>
