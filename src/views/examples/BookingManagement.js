@@ -47,9 +47,7 @@ const Tables = () => {
     setBookingSeletedId(id);
     setIsModalVisible(true);
   };
-  const showModalAdd = () => {
-    setBookingVisible(true);
-  };
+
   const handleOk = () => {
     try {
       console.log("listImage", listImage);
@@ -107,7 +105,7 @@ const Tables = () => {
       })
       .then((response) => {
         console.log(response.data);
-        setBooking(response.data?.data);
+        setBooking(response.data);
       })
       .catch((err) => console.warn(err));
   };
@@ -228,7 +226,31 @@ const Tables = () => {
                               style={{ marginRight: "10px" }}
                               className="btn-modal"
                               type="primary"
-                              // onClick={() => showModal(bookings.id)}
+                              onClick={() => {
+                                if (
+                                  window.confirm(
+                                    "Are you sure you want to delete this row booking into the database?"
+                                  )
+                                ) {
+                                  axios
+                                    .delete(
+                                      `/api/auth/booking-tour-admin/${bookings.id}`
+                                    )
+                                    .then(function (response) {
+                                      loadData();
+
+                                      console.log(response);
+                                    })
+                                    .catch(function (error) {
+                                      console.log(error);
+                                    });
+                                } else {
+                                  // Do nothing!
+                                  console.log(
+                                    "booking was not delete to the database."
+                                  );
+                                }
+                              }}
                             >
                               Delete
                             </Button>

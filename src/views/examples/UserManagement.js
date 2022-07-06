@@ -38,7 +38,6 @@ const Tables = () => {
   const [placement, SetPlacement] = useState("topLeft");
 
   const showModal = (id) => {
-    console.log(id);
     setUserSeletedId(id);
     setIsModalVisible(true);
   };
@@ -47,8 +46,34 @@ const Tables = () => {
     setShowNewModel(true);
   };
 
+  const handleChangeInput = (e) => {
+    setUsers((prevTour) => {
+      console.log({ ...prevTour, [e.target.name]: e.target.value });
+      return { ...prevTour, [e.target.name]: e.target.value };
+    });
+  };
+
   const handleOk = () => {
-    setIsModalVisible(false);
+    try {
+      axios
+        .post("/api/auth/get-all-user", {
+          name: "Anh Nhất",
+          email: "nhatqewaqe@gmail.com",
+          phone: "154631616546",
+          gender: 1,
+          birthday: "02-02-2001",
+        })
+        .then(function (response) {
+          alert("create user success");
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+      setIsModalVisible(false);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const handleCancel = () => {
@@ -128,18 +153,6 @@ const Tables = () => {
       });
   };
 
-  // const addData = async () => {
-  //   axios
-  //     .post("/api/auth/get-all-user")
-  //     .then((res) => {
-  //       console.log(res);
-  //       setUsers(res.data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
@@ -162,7 +175,7 @@ const Tables = () => {
           <div className="col">
             <Card className="shadow">
               <CardHeader className="border-0">
-                <h3 className="mb-0">Card tables</h3>
+                <h3 className="mb-0"> User Management</h3>
               </CardHeader>
               <Table className="align-items-center table-flush" responsive>
                 <thead className="thead-light">
@@ -191,9 +204,19 @@ const Tables = () => {
                       >
                         <form>
                           <label className="label">Email</label>
-                          <Input placeholder="email" />
+                          <Input
+                            placeholder="email"
+                            name="email"
+                            onChange={handleChangeInput}
+                            value={users.email}
+                          />
                           <label className="label">User name</label>
-                          <Input placeholder="username" />
+                          <Input
+                            placeholder="username"
+                            name="name"
+                            onChange={handleChangeInput}
+                            // value={users.name}
+                          />
                           <label className="label">Phone</label>
                           <Input placeholder="phone" />
                           <label className="label">Birtday</label>
@@ -247,7 +270,33 @@ const Tables = () => {
                             Update
                           </Button>
 
-                          <Button className="btn-modal" type="primary">
+                          <Button
+                            className="btn-modal"
+                            type="primary"
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  "Are you sure you want to save this thing into the database?"
+                                )
+                              ) {
+                                axios
+                                  .delete(`/api/auth/get-all-user/${users.id}`)
+                                  .then(function (response) {
+                                    loadData();
+
+                                    console.log(response);
+                                  })
+                                  .catch(function (error) {
+                                    console.log(error);
+                                  });
+                              } else {
+                                // Do nothing!
+                                console.log(
+                                  "Thing was not saved to the database."
+                                );
+                              }
+                            }}
+                          >
                             Delete
                           </Button>
                         </td>

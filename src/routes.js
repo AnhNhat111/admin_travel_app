@@ -39,6 +39,13 @@ var routes = [
   },
 
   {
+    path: "/user-management",
+    name: "User Management",
+    icon: "ni ni-pin-3 text-orange",
+    component: UserManagement,
+    layout: "/admin",
+  },
+  {
     path: "/tour-management",
     name: "Tour Management",
     icon: "ni ni-pin-3 text-orange",
@@ -50,13 +57,6 @@ var routes = [
     name: "Booking Management",
     icon: "ni ni-pin-3 text-orange",
     component: BookingManagement,
-    layout: "/admin",
-  },
-  {
-    path: "/user-management",
-    name: "User Management",
-    icon: "ni ni-pin-3 text-orange",
-    component: UserManagement,
     layout: "/admin",
   },
   {

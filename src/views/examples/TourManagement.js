@@ -206,21 +206,6 @@ const Tables = () => {
       });
   };
 
-  const addData = async () => {
-    axios
-      .post("/api/auth/get-all-user", {
-        firstName: "Fred",
-        lastName: "Flintstone",
-      })
-      .then((res) => {
-        console.log(res);
-        setTours(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   const gotopages = async (page) => {
     axios
       .get(`/api/auth/user-tour`, {

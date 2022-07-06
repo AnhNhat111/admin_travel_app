@@ -1,10 +1,19 @@
-import { Modal, Input, Col, Select, Space, DatePicker, Radio } from "antd";
+import {
+  Modal,
+  Input,
+  Select,
+  Space,
+  DatePicker,
+  Radio,
+  InputNumber,
+  Row,
+} from "antd";
 import { Option } from "antd/lib/mentions";
 import { useState, useEffect } from "react";
 import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import storage from "../../config/firebaseConfig";
 import axios from "../../config/axiosConfig";
-import { IoThunderstormSharp } from "react-icons/io5";
+import { Col } from "reactstrap";
 
 const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
   const [tour, setTour] = useState({});
@@ -19,6 +28,7 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
     });
   };
 
+  const { TextArea } = Input;
   const { RangePicker } = DatePicker;
 
   const onFileChange = (event) => {
@@ -34,18 +44,19 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
           name: tour.name,
           date_to: date_to,
           date_from: date_from,
-          schedule: "",
+          schedule: tour.schedule,
           hotel: tour.hotel,
-          image: "",
+          image: "images",
           price_child: tour.price_child,
           price_adult: tour.price_adult,
-          start_location_id: 1,
-          end_location_id: 2,
+          start_location_id: start_location,
+          end_location_id: end_location,
           capacity: tour.capacity,
           available_capacity: tour.available_capacity,
           type_id: 1,
-          vehicle_id: 1,
+          vehicle_id: vehicle_id,
           promotion_id: 1,
+          status: status,
         })
         .then(function (response) {
           listImage.map((file) => {
@@ -79,14 +90,20 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
       console.log(e);
     }
   };
-  const [value, setValue] = useState(1);
+  const [status, setValue] = useState(status);
+
   const onChange = (e) => {
     setValue(e.target.value);
   };
+
   const [dataLocation, setDataLocation] = useState([]);
   const [dataVehicle, setDataVehicle] = useState([]);
   const [date_from, setDateFrom] = useState();
   const [date_to, setDateTo] = useState();
+  const [vehicle_id, setVehicle] = useState(vehicle_id);
+
+  const [start_location, setStartLocation] = useState(start_location);
+  const [end_location, setEndLocation] = useState(end_location);
 
   const loadData = async () => {
     axios
@@ -130,100 +147,49 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
   return (
     <Modal title={title} visible={visible} onOk={handleOk} onCancel={onCancel}>
       <form>
-        <label className="label"> name</label>
-        <Input
-          placeholder="name"
-          name="name"
-          onChange={handleChangeInput}
-          value={tour.name}
-        />
+        <Row>
+          <label className="label"> name</label>
+          <Input
+            placeholder="name"
+            name="name"
+            onChange={handleChangeInput}
+            value={tour.name}
+          />
+        </Row>
 
-        <label className="label">price child</label>
-        <Input
-          placeholder="price child"
-          name="price_child"
-          onChange={handleChangeInput}
-          value={tour.price_child}
-        />
+        <Row>
+          <label className="label">hotel</label>
+          <TextArea
+            name="hotel"
+            style={{ height: "150px" }}
+            placeholder="hotel"
+            onChange={handleChangeInput}
+            value={tour.hotel}
+          ></TextArea>
+        </Row>
 
-        <label className="label">price_adult</label>
-        <Input
-          placeholder="price adult"
-          onChange={handleChangeInput}
-          value={tour.price_adult}
-        />
+        <Row>
+          <label className="label">schedule</label>
+          <TextArea
+            name="schedule"
+            style={{ height: "150px" }}
+            placeholder="schedule"
+            onChange={handleChangeInput}
+            value={tour.schedule}
+          ></TextArea>
+        </Row>
 
-        <label className="label">Vehicle</label>
-        <br />
+        <Row>
+          <label className="label">description</label>
+          <TextArea
+            name="description"
+            style={{ height: "150px" }}
+            placeholder="description"
+            onChange={handleChangeInput}
+            value={tour.description}
+          ></TextArea>
+        </Row>
 
-        <Col flex="0 1 300px">
-          <Select defaultValue="Choose" style={{ width: 120 }}>
-            {dataVehicle.map((item, index) => (
-              <Option value={item.id}>{item.name}</Option>
-            ))}
-          </Select>
-        </Col>
-
-        <label className="label">capacity</label>
-        <Input
-          placeholder="capacity"
-          onChange={handleChangeInput}
-          value={tour.capacity}
-        />
-
-        <label className="label">hotel</label>
-        <Input
-          style={{ height: "150px" }}
-          placeholder="hotel"
-          onChange={handleChangeInput}
-          value={tour.hotel}
-        />
-
-        <label className="label">schedule</label>
-        <Input
-          style={{ height: "150px" }}
-          placeholder="schedule"
-          onChange={handleChangeInput}
-          value={tour.schedule}
-        />
-        <label className="label">description</label>
-        <Input
-          style={{ height: "150px" }}
-          placeholder="description"
-          onChange={handleChangeInput}
-          value={tour.direction}
-        />
-
-        <label className="label">available capacity </label>
-        <Input
-          placeholder="available capacity"
-          onChange={handleChangeInput}
-          value={tour.available_capacity}
-        />
-
-        <label className="label">location start</label>
-        <br />
-
-        <Col flex="0 1 300px">
-          <Select defaultValue="Choose" style={{ width: 120 }}>
-            {dataLocation.map((item, index) => (
-              <Option value={item.id}>{item.name}</Option>
-            ))}
-          </Select>
-        </Col>
-
-        <label className="label">location end</label>
-        <br />
-
-        <Col flex="1 1 100px">
-          <Select defaultValue="Choose" style={{ width: 120 }}>
-            {dataLocation.map((item, index) => (
-              <Option value={item.id}>{item.name}</Option>
-            ))}
-          </Select>
-        </Col>
-
-        <br />
         <label className="label">Date to</label>
         <br />
         <Space direction="vertical" size={12}>
@@ -248,24 +214,147 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
             }}
           />
         </Space>
-        <br />
-        <br />
-        <input type="file" multiple="true" onChange={onFileChange} />
-        {listImage.map((item, index) => (
-          <img
-            src={URL.createObjectURL(item)}
-            style={{ width: 200, height: 200 }}
-          />
-        ))}
-        <br />
-        <label className="label" style={{ marginBottom: "10px" }}>
-          Status
-        </label>
-        <br />
-        <Radio.Group onChange={onChange} value={value}>
-          <Radio value={1}>Active</Radio>
-          <Radio value={2}>Not Active</Radio>
-        </Radio.Group>
+
+        <Row>
+          <Col>
+            <label className="label">Vehicle</label>
+            <br />
+
+            <Select
+              defaultValue="Choose"
+              style={{ width: 120 }}
+              onChange={setVehicle}
+            >
+              {dataVehicle.map((item, index) => (
+                <Option value={item.id}>{item.name}</Option>
+              ))}
+            </Select>
+          </Col>
+
+          <Col>
+            <label className="label">location start</label>
+            <br />
+
+            <Select
+              defaultValue="Choose"
+              style={{ width: 120 }}
+              onChange={setStartLocation}
+            >
+              {dataLocation.map((item, index) => (
+                <Option name="location_start" value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+
+          <Col>
+            <label className="label">location end</label>
+            <br />
+
+            <Select
+              defaultValue="Choose"
+              style={{ width: 120 }}
+              onChange={setEndLocation}
+            >
+              {dataLocation.map((item, index) => (
+                <Option name="location_end" value={item.id}>
+                  {item.name}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col>
+            <label className="label">price child</label>
+            <br />
+            <Input
+              placeholder="price child"
+              name="price_child"
+              onChange={handleChangeInput}
+              value={tour.price_child}
+              min={1}
+              max={10}
+              defaultValue={0}
+            />
+          </Col>
+
+          <Col>
+            <label className="label">price_adult</label>
+            <br />
+            <Input
+              name="price_adult"
+              placeholder="price adult"
+              onChange={handleChangeInput}
+              value={tour.price_adult}
+              min={1}
+              max={10}
+              defaultValue={0}
+            />
+          </Col>
+
+          <Col>
+            <label className="label">capacity</label>
+            <br />
+            <Input
+              name="capacity"
+              placeholder="capacity"
+              onChange={handleChangeInput}
+              value={tour.capacity}
+              min={1}
+              max={10}
+              defaultValue={0}
+            />
+          </Col>
+
+          <Col>
+            <label className="label">available</label>
+            <br />
+            <Input
+              name="available_capacity"
+              placeholder="available capacity"
+              onChange={handleChangeInput}
+              value={tour.available_capacity}
+              min={1}
+              max={10}
+              defaultValue={0}
+            />
+          </Col>
+        </Row>
+
+        <Row className="images-input">
+          <Col>
+            <input type="file" multiple="true" onChange={onFileChange} />
+          </Col>
+
+          <Col>
+            {listImage.map((item, index) => (
+              <img
+                src={URL.createObjectURL(item)}
+                style={{ width: 200, height: 200 }}
+              />
+            ))}
+          </Col>
+        </Row>
+
+        <Row>
+          <Col>
+            <label
+              name="status"
+              className="label"
+              style={{ marginBottom: "10px" }}
+            >
+              Status
+            </label>
+
+            <Radio.Group onChange={onChange} value={status}>
+              <Radio value={1}>Active</Radio>
+              <Radio value={2}>Not Active</Radio>
+            </Radio.Group>
+          </Col>
+        </Row>
       </form>
     </Modal>
   );
