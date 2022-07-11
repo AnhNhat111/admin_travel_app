@@ -33,9 +33,12 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
 
   const onFileChange = (event) => {
     const newArr = [...listImage];
-    newArr.push(event.target.files[0]);
+    newArr.push(event.target.files);
     setListImage(newArr);
   };
+  function onImageChange(e) {
+    setListImage([...e.target.files]);
+  }
 
   const handleOk = () => {
     try {
@@ -65,6 +68,7 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
             uploadBytes(imageRef, file).then((snapshot) => {
               getDownloadURL(snapshot.ref).then((url) => {
                 console.log(url);
+
                 axios
                   .post("/api/auth/images", {
                     tour_id: response.data.id,
@@ -80,6 +84,7 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
               });
             });
           });
+          console.log(listImage);
           alert("create success");
         })
         .catch(function (error) {
@@ -327,17 +332,15 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
 
         <Row className="images-input">
           <Col>
-            <input type="file" multiple="true" onChange={onFileChange} />
+            <input type="file" multiple="true" onChange={onImageChange} />
           </Col>
 
-          <Col>
-            {listImage.map((item, index) => (
-              <img
-                src={URL.createObjectURL(item)}
-                style={{ width: 200, height: 200 }}
-              />
-            ))}
-          </Col>
+          {listImage.map((item, index) => (
+            <img
+              src={URL.createObjectURL(item)}
+              style={{ width: 200, height: 200 }}
+            />
+          ))}
         </Row>
 
         <Row>

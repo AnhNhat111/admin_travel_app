@@ -55,7 +55,7 @@ var routes = [
   {
     path: "/booking-management",
     name: "Booking Management",
-    icon: "ni ni-pin-3 text-orange",
+    icon: "add-circle-outline text-orange",
     component: BookingManagement,
     layout: "/admin",
   },
