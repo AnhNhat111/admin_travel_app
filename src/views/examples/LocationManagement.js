@@ -4,11 +4,22 @@ import Header from "components/Headers/Header.js";
 import { useEffect, useState } from "react";
 import axios from "../../config/axiosConfig";
 import { Button, Input, Modal } from "antd";
+import moment from "moment";
 const Tables = () => {
   const [locations, setLocations] = useState([]);
+  const [dataAddLocation, setDataAddLocation] = useState([]);
+
   const [TourSeletedId, setTourSeletedId] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isTourVisible, setTourVisible] = useState(false);
+  const [isLocationVisible, setLocationVisible] = useState(false);
+
+  const handleChangeInputAdd = (e) => {
+    setDataAddLocation((prevTour) => {
+      console.log({ ...prevTour, [e.target.name]: e.target.value });
+
+      return { ...prevTour, [e.target.name]: e.target.value };
+    });
+  };
 
   const showModal = (id) => {
     setTourSeletedId(id);
@@ -16,13 +27,34 @@ const Tables = () => {
   };
 
   const showModalAdd = () => {
-    setTourVisible(true);
+    setLocationVisible(true);
   };
   useEffect(() => {
     loadData();
   }, []);
 
   const handleOk = () => {
+    try {
+      axios
+        .post("/api/auth/location", {
+          name: dataAddLocation.name,
+          status: 1,
+        })
+        .then(function (response) {
+          loadData();
+          alert("create location success");
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      setLocationVisible(false);
+      setIsModalVisible(false);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleCancel = () => {
     setIsModalVisible(false);
   };
 
@@ -30,9 +62,7 @@ const Tables = () => {
     axios
       .get("/api/auth/location")
       .then((res) => {
-        console.log(res);
         setLocations(res.data);
-        console.group(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -56,27 +86,32 @@ const Tables = () => {
                   <tr>
                     <th scope="col">STT</th>
                     <th scope="col">Name</th>
+                    <th scope="col">Ngày tạo</th>
+                    <th scope="col">Ngày cập nhật</th>
                     <th scope="col">Status</th>
                     <th>
                       <Button
+                        style={{ width: "155px" }}
                         className="btn-add"
                         type="primary"
                         onClick={showModalAdd}
                       >
-                        Add Tour
+                        Add
                       </Button>
                       <Modal
                         title="ADD"
-                        visible={isTourVisible}
+                        visible={isLocationVisible}
                         onOk={handleOk}
-                        onCancel={() => setTourVisible(false)}
+                        onCancel={() => setLocationVisible(false)}
                       >
                         <form>
-                          <label className="label">description</label>
-                          <Input placeholder="description" />
-
-                          <label className="label">available capacity </label>
-                          <Input placeholder="available capacity	" />
+                          <label className="name">Location name</label>
+                          <Input
+                            placeholder="Location name"
+                            name="name"
+                            onChange={handleChangeInputAdd}
+                            value={dataAddLocation.name}
+                          />
                         </form>
                       </Modal>
                     </th>
@@ -84,7 +119,7 @@ const Tables = () => {
                 </thead>
                 <tbody>
                   {locations &&
-                    locations.map((locations, index) => {
+                    locations?.map((locations, index) => {
                       return (
                         <tr>
                           <th scope="row">
@@ -94,7 +129,58 @@ const Tables = () => {
                           </th>
                           <td>{locations.name}</td>
                           <td>
+                            {moment(locations.created_at).format(
+                              "DD-MM-YYYY hh:mm:ss"
+                            )}
+                          </td>
+                          <td>
+                            {moment(locations.updated_at).format(
+                              "DD-MM-YYYY hh:mm:ss"
+                            )}
+                          </td>
+                          <td>
                             {locations.status === 1 ? "active" : "not active"}
+                          </td>
+                          <td>
+                            <Button
+                              style={{ marginRight: "5px" }}
+                              className="btn-modal"
+                              type="primary"
+                              onClick={() => showModal(locations.id)}
+                            >
+                              Update
+                            </Button>
+                            <Button
+                              className="btn-modal"
+                              type="primary"
+                              onClick={() => {
+                                if (
+                                  window.confirm(
+                                    "Are you sure you want to save this thing into the database?"
+                                  )
+                                ) {
+                                  axios
+                                    .delete(
+                                      `/api/auth/location/${locations.id}`
+                                    )
+                                    .then(function (response) {
+                                      loadData();
+
+                                      console.log(response);
+                                    })
+                                    .catch(function (error) {
+                                      console.log(error);
+                                    });
+                                } else {
+                                  // Do nothing!
+                                  console.log(
+                                    "Thing was not saved to the database."
+                                  );
+                                }
+                              }}
+                            >
+                              Delete
+                            </Button>
                           </td>
                         </tr>
                       );

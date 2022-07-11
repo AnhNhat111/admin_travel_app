@@ -17,6 +17,8 @@
 */
 import { Link } from "react-router-dom";
 // reactstrap components
+import { useHistory } from "react-router-dom";
+import { TOKEN_KEY } from "../../constants/index";
 import {
   DropdownMenu,
   DropdownItem,
@@ -35,6 +37,14 @@ import {
 } from "reactstrap";
 
 const AdminNavbar = (props) => {
+  const history = useHistory();
+
+  const logout = () => {
+    console.log("#123");
+    sessionStorage.removeItem(TOKEN_KEY);
+    history.push("/login");
+  };
+
   return (
     <>
       <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
@@ -78,7 +88,7 @@ const AdminNavbar = (props) => {
                 </Media>
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-arrow" right>
-                <DropdownItem className="noti-title" header tag="div">
+                {/* <DropdownItem className="noti-title" header tag="div">
                   <h6 className="text-overflow m-0">Welcome!</h6>
                 </DropdownItem>
                 <DropdownItem to="/admin/user-profile" tag={Link}>
@@ -97,8 +107,8 @@ const AdminNavbar = (props) => {
                   <i className="ni ni-support-16" />
                   <span>Support</span>
                 </DropdownItem>
-                <DropdownItem divider />
-                <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
+                <DropdownItem divider /> */}
+                <DropdownItem href="#pablo" onClick={() => logout()}>
                   <i className="ni ni-user-run" />
                   <span>Logout</span>
                 </DropdownItem>

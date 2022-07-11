@@ -37,7 +37,7 @@ const Admin = (props) => {
   const history = useHistory();
 
   useEffect(() => {
-    if (validToken()) {
+    if (!validToken()) {
       history.push("/auth/login");
     }
   }, []);

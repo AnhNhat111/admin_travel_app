@@ -19,6 +19,7 @@
 // reactstrap components
 import React from "react";
 import { useHistory } from "react-router-dom";
+import { TOKEN_KEY } from "../../constants/index";
 import {
   Button,
   Card,
@@ -34,6 +35,7 @@ import {
   Col,
   Spinner,
 } from "reactstrap";
+
 const Login = () => {
   const history = useHistory();
   const [loginInputs, setLoginInputs] = React.useState({
@@ -67,7 +69,7 @@ const Login = () => {
         body: JSON.stringify(loginBodyData),
       });
       const data = await resJson.json();
-      sessionStorage.setItem("access_token", data.access_token);
+      sessionStorage.setItem(TOKEN_KEY, data.access_token);
       history.push("/admin/index");
     } catch (e) {
       alert("Loi dang nhap");
@@ -194,9 +196,7 @@ const Login = () => {
               className="text-light"
               href="#pablo"
               onClick={(e) => e.preventDefault()}
-            >
-              <small>Forgot password?</small>
-            </a>
+            ></a>
           </Col>
           <Col className="text-right" xs="6">
             <a
@@ -205,9 +205,7 @@ const Login = () => {
               onClick={(e) => {
                 e.preventDefault();
               }}
-            >
-              <small>Create new account</small>
-            </a>
+            ></a>
           </Col>
         </Row>
       </Col>

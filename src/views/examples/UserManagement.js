@@ -14,7 +14,7 @@ import {
 import "antd/dist/antd.css";
 import "./style.css";
 import "antd/dist/antd.css";
-import { Button, Modal, Input, Radio, DatePicker } from "antd";
+import { Button, Modal, Input, Radio, DatePicker, Checkbox } from "antd";
 import Header from "components/Headers/Header.js";
 import { useEffect, useState } from "react";
 import axios from "../../config/axiosConfig";
@@ -24,12 +24,14 @@ import TourModal from "./TourModal";
 
 const Tables = () => {
   const [users, setUsers] = useState([]);
+  const [dataAddUser, setDataAddUser] = useState([]);
   // const [listImage, setListImage] = useState([]);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isShowNewModel, setShowNewModel] = useState(false);
 
-  const [UserSeletedId, setUserSeletedId] = useState(null);
+  const [userSeletedId, setUserSeletedId] = useState(null);
+
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [previewTitle, setPreviewTitle] = useState("");
@@ -53,23 +55,30 @@ const Tables = () => {
     });
   };
 
+  const handleChangeInputAdd = (e) => {
+    setDataAddUser((prevTour) => {
+      return { ...prevTour, [e.target.name]: e.target.value };
+    });
+  };
+
   const handleOk = () => {
     try {
       axios
         .post("/api/auth/get-all-user", {
-          name: "Anh Nhất",
-          email: "nhatqewaqe@gmail.com",
-          phone: "154631616546",
-          gender: 1,
-          birthday: "02-02-2001",
+          name: dataAddUser.name,
+          email: dataAddUser.email,
+          phone: dataAddUser.phone,
+          gender: dataAddUser.gender,
+          birthday: moment(dataAddUser.birthday).format("DD-MM-YYYY"),
         })
         .then(function (response) {
+          console.log(response);
           alert("create user success");
+          loadData();
         })
         .catch(function (error) {
           console.log(error);
         });
-
       setIsModalVisible(false);
     } catch (e) {
       console.log(e);
@@ -84,22 +93,22 @@ const Tables = () => {
     return (
       <form>
         <label className="label">Email</label>
-        <Input placeholder="email" value={users[UserSeletedId].email} />
+        <Input placeholder="email" value={users[userSeletedId].email} />
         <label className="label">User name</label>
-        <Input placeholder="username" value={users[UserSeletedId].name} />
+        <Input placeholder="username" value={users[userSeletedId].name} />
         <label className="label">Phone</label>
-        <Input placeholder="phone" value={users[UserSeletedId].phone} />
+        <Input placeholder="phone" value={users[userSeletedId].phone} />
         <label className="label">Birtday</label>
         <br />
         <DatePicker
           placement={placement}
-          value={formatDate(users[UserSeletedId].birthday)}
+          value={formatDate(users[userSeletedId].birthday)}
           format="DD/MM/YYYY"
         />
         <br />
         <label className="label">Gender</label>
         <br />
-        <Radio.Group value={users[UserSeletedId].gender == 1 ? 1 : 0}>
+        <Radio.Group value={users[userSeletedId].gender == 1 ? 1 : 0}>
           <Radio value={1}>male</Radio>
           <Radio value={0}>female</Radio>
         </Radio.Group>
@@ -108,7 +117,7 @@ const Tables = () => {
           Status
         </label>
         <br />
-        <Radio.Group value={users[UserSeletedId].status == 1 ? 1 : 0}>
+        <Radio.Group value={users[userSeletedId].status == 1 ? 1 : 0}>
           <Radio value={1}>active</Radio>
         </Radio.Group>
       </form>
@@ -165,6 +174,20 @@ const Tables = () => {
     );
   };
 
+  const [active, setActive] = useState(active);
+
+  const onActive = (e) => {
+    setActive(e.target.checked);
+  };
+
+  const [status, setValue] = useState(status);
+
+  const onChange = (e) => {
+    setDataAddUser((prevTour) => {
+      return { ...prevTour, gender: e.target.value };
+    });
+  };
+
   return (
     <>
       <Header />
@@ -207,27 +230,44 @@ const Tables = () => {
                           <Input
                             placeholder="email"
                             name="email"
-                            onChange={handleChangeInput}
-                            value={users.email}
+                            onChange={handleChangeInputAdd}
+                            value={dataAddUser.email}
                           />
                           <label className="label">User name</label>
                           <Input
                             placeholder="username"
                             name="name"
-                            onChange={handleChangeInput}
-                            // value={users.name}
+                            onChange={handleChangeInputAdd}
+                            value={dataAddUser.name}
                           />
                           <label className="label">Phone</label>
-                          <Input placeholder="phone" />
+                          <Input
+                            placeholder="phone"
+                            name="phone"
+                            onChange={handleChangeInputAdd}
+                            value={dataAddUser.phone}
+                          />
                           <label className="label">Birtday</label>
                           <br />
-                          <DatePicker placement={placement} />
+                          <DatePicker
+                            placement={placement}
+                            onChange={(e) =>
+                              setDataAddUser((prevTour) => {
+                                return { ...prevTour, birthday: e };
+                              })
+                            }
+                          />
                           <br />
                           <label className="label">Gender</label>
                           <br />
                           <>
-                            <Radio>male</Radio>
-                            <Radio>Female</Radio>
+                            <Radio.Group
+                              onChange={onChange}
+                              value={dataAddUser.gender}
+                            >
+                              <Radio value={1}>Male</Radio>
+                              <Radio value={0}>Female</Radio>
+                            </Radio.Group>
                           </>
                           <br />
                           <label
@@ -237,7 +277,9 @@ const Tables = () => {
                             Status
                           </label>
                           <br />
-                          <Radio>Active</Radio>
+                          <Checkbox className="active" onChange={onActive}>
+                            Active
+                          </Checkbox>
                         </form>
                       </Modal>
                     </th>
@@ -373,13 +415,14 @@ const Tables = () => {
             </Card>
           </div>
         </Row>
+
         <Modal
           title="Update"
           visible={isModalVisible}
           onOk={handleOk}
           onCancel={handleCancel}
         >
-          <div className="">{UserSeletedId && formData()}</div>
+          <div className="">{userSeletedId && formData()}</div>
         </Modal>
       </Container>
     </>

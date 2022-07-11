@@ -53,6 +53,7 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
           end_location_id: end_location,
           capacity: tour.capacity,
           available_capacity: tour.available_capacity,
+          description: tour.description,
           type_id: 1,
           vehicle_id: vehicle_id,
           promotion_id: 1,
@@ -105,7 +106,7 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
   const [start_location, setStartLocation] = useState(start_location);
   const [end_location, setEndLocation] = useState(end_location);
 
-  const loadData = async () => {
+  const loadLocation = async () => {
     axios
       .get("/api/auth/location")
       .then((res) => {
@@ -117,7 +118,7 @@ const TourModal = ({ title, visible, onOK, onCancel, setVisible }) => {
   };
 
   useEffect(() => {
-    loadData();
+    loadLocation();
   }, []);
 
   const loadDataVehicle = async () => {

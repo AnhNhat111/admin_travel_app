@@ -42,7 +42,6 @@ const Tables = () => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [tourSeleted, setTourSeleted] = useState(null);
-
   const [isShowNewModal, setShowNewModel] = useState(false);
 
   const [listImage, setListImage] = useState([]);
@@ -55,6 +54,8 @@ const Tables = () => {
 
   const { RangePicker } = DatePicker;
   const [placement, SetPlacement] = useState("topLeft");
+
+  const { TextArea } = Input;
 
   const showModal = (id) => {
     setTourSeleted(tours.find((x) => x.id == id));
@@ -82,6 +83,12 @@ const Tables = () => {
     }
   };
 
+  const handleChangeInputUpdate = (e) => {
+    setTourSeleted((prevTour) => {
+      return { ...prevTour, [e.target.name]: e.target.value };
+    });
+  };
+
   const handleCancel = () => {
     setIsModalVisible(false);
   };
@@ -100,56 +107,222 @@ const Tables = () => {
     loadData();
   }, []);
 
+  const [vehicle_id, setVehicle] = useState(vehicle_id);
+
+  const dateFormat = "YYYY/MM/DD";
+
+  const [dataVehicle, setDataVehicle] = useState([]);
+  const loadDataVehicle = async () => {
+    axios
+      .get("/api/auth/vehicle")
+      .then((res) => {
+        setDataVehicle(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  useEffect(() => {
+    loadDataVehicle();
+  }, []);
+
+  const [start_location, setStartLocation] = useState(start_location);
+  const [end_location, setEndLocation] = useState(end_location);
+  const [dataLocation, setDataLocation] = useState([]);
+
+  const loadLocation = async () => {
+    axios
+      .get("/api/auth/location")
+      .then((res) => {
+        setDataLocation(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleUpdate = () => {
+    try {
+      axios
+        .put("/api/auth/tour/" + tourSeleted.id, {
+          name: tourSeleted.name,
+          date_to: tourSeleted.date_to,
+          date_from: tourSeleted.date_from,
+          schedule: tourSeleted.schedule,
+          hotel: tourSeleted.hotel,
+          image: "images",
+          price_child: tourSeleted.price_child,
+          price_adult: tourSeleted.price_adult,
+          start_location_id: tourSeleted.start_location.id,
+          end_location_id: tourSeleted.end_location.id,
+          capacity: tourSeleted.capacity,
+          available_capacity: tourSeleted.available_capacity,
+          type_id: 1,
+          vehicle_id: tourSeleted.vehicle_id,
+          promotion_id: 1,
+        })
+        .then(function (response) {
+          listImage.map((file) => {
+            const imageRef = ref(storage, `images/${file.name}`);
+            uploadBytes(imageRef, file).then((snapshot) => {
+              getDownloadURL(snapshot.ref).then((url) => {
+                console.log(url);
+                axios
+                  .post("/api/auth/images", {
+                    tour_id: response.data.id,
+                    image_path: url,
+                    name: file.name,
+                  })
+                  .then(function (response) {
+                    console.log(response);
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+              });
+            });
+          });
+          gotopages();
+          alert("create success");
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      setIsModalVisible(false);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    loadLocation();
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
   const formData = () => {
-    console.log(tours);
     return (
       <form>
-        <label className="label"> name</label>
-        <Input placeholder="name" value={tourSeleted.name} />
+        <Row>
+          <label className="label">
+            <b>Tour Name</b>
+          </label>
+          <Input
+            placeholder="name"
+            name="name"
+            onChange={handleChangeInputUpdate}
+            value={tourSeleted.name}
+          />
+        </Row>
+
+        <Row>
+          <label className="label">
+            <b>Hotel</b>
+          </label>
+          <TextArea
+            name="hotel"
+            style={{ height: "150px" }}
+            placeholder="hotel"
+            onChange={handleChangeInputUpdate}
+            value={tourSeleted.hotel}
+          ></TextArea>
+        </Row>
+
+        <Row>
+          <label className="label">schedule</label>
+          <TextArea
+            name="schedule"
+            style={{ height: "150px" }}
+            placeholder="schedule"
+            onChange={handleChangeInputUpdate}
+            value={tourSeleted.schedule}
+          ></TextArea>
+        </Row>
+
+        <Row>
+          <label className="label">description</label>
+          <TextArea
+            name="description"
+            style={{ height: "150px" }}
+            placeholder="description"
+            onChange={handleChangeInputUpdate}
+            value={tourSeleted.description}
+          ></TextArea>
+        </Row>
+
         <label className="label">price child</label>
-        <Input placeholder="price child" value={tourSeleted.price_child} />
-        <label className="label">price_adult</label>
-        <Input placeholder="price adlut" value={tourSeleted.price_adult} />
-        <label className="label">vehicle</label>
         <Input
-          placeholder="vehicle"
-          // value={tourSeleted.vehicle.map((item) => item.name)}
+          name="price_child"
+          placeholder="price child"
+          value={tourSeleted.price_child}
+          onChange={handleChangeInputUpdate}
         />
+        <label className="label">price_adult</label>
+        <Input
+          name="price_adult"
+          placeholder="price adlut"
+          value={tourSeleted.price_adult}
+          onChange={handleChangeInputUpdate}
+        />
+        <label className="label">Vehicle</label>
+        <br />
+        <Select
+          defaultValue={tourSeleted?.vehicle?.name || "Choose"}
+          style={{ width: 120 }}
+          onChange={setVehicle}
+        >
+          {dataVehicle.map((item, index) => (
+            <Option value={item.id}>{item.name}</Option>
+          ))}
+        </Select>
+        <br />
         <label className="label">capacity</label>
-        <Input placeholder="capacity" value={tourSeleted.capacity} />
+        <Input
+          nmae="capacity"
+          placeholder="capacity"
+          value={tourSeleted.capacity}
+          onChange={handleChangeInputUpdate}
+        />
         <label className="label">available capacity </label>
         <Input
+          name="available_capacity"
           placeholder="available capacity"
           value={tourSeleted.available_capacity}
+          onChange={handleChangeInputUpdate}
         />
-        <label className="label">hotel</label>
-        <Input style={{ height: "150px" }} placeholder="hotel" />
-        <label className="label">schedule</label>
-        <Input style={{ height: "150px" }} placeholder="schedule" />
-        <label className="label">description</label>
-        <Input style={{ height: "150px" }} placeholder="description" />
-        <label className="label">location start</label>
-        <br />
-        <Col flex="0 1 300px">
+
+        <Col>
+          <label className="label">location end</label>
+          <br />
+
           <Select
             defaultValue="Choose"
             style={{ width: 120 }}
-            onChange={handleChange}
+            onChange={setStartLocation}
           >
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
+            {dataLocation.map((item, index) => (
+              <Option name="location_start" value={item.id}>
+                {item.name}
+              </Option>
+            ))}
           </Select>
         </Col>
-        <label className="label">location start</label>
-        <br />
-        <Col flex="1 1 100px">
+        <Col>
+          <label className="label">location start</label>
+          <br />
+
           <Select
             defaultValue="Choose"
             style={{ width: 120 }}
-            onChange={handleChange}
+            onChange={setStartLocation}
           >
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
+            {dataLocation.map((item, index) => (
+              <Option name="location_start" value={item.id}>
+                {item.name}
+              </Option>
+            ))}
           </Select>
         </Col>
         <br />
@@ -157,6 +330,11 @@ const Tables = () => {
         <br />
         <Space direction="vertical" size={12}>
           <RangePicker
+            defaultValue={[
+              moment(tourSeleted.date_from, dateFormat),
+              moment(tourSeleted.date_to, dateFormat),
+            ]}
+            format={dateFormat}
             dateRender={(current) => {
               const style = {};
 
@@ -175,13 +353,11 @@ const Tables = () => {
         </Space>
         <br />
         <br />
-
         <input type="file" multiple="true" onChange={onFileChange} />
         {tourSeleted.images.lenght > 0 &&
           tourSeleted.images.map((item, index) => (
             <img src={item.image_path} style={{ width: 200, height: 200 }} />
           ))}
-
         <br />
         <label className="label" style={{ marginBottom: "10px" }}>
           Status
@@ -305,8 +481,8 @@ const Tables = () => {
                           <td>{tour.name}</td>
                           <td>{tour.price_child}</td>
                           <td>{tour.price_adult}</td>
-                          <td>{tour.start_location.name}</td>
-                          <td>{tour.end_location.name}</td>
+                          <td>{tour.start_location?.name}</td>
+                          <td>{tour.end_location?.name}</td>
                           <td>{tour.available_capacity}</td>
                           <td>{tour.status === 1 ? "active" : "not active"}</td>
                           <td className="btn-update">
@@ -426,7 +602,7 @@ const Tables = () => {
         <Modal
           title="Update"
           visible={isModalVisible}
-          onOk={handleOk}
+          onOk={handleUpdate}
           onCancel={handleCancel}
         >
           <div className="">{tourSeleted && formData()}</div>

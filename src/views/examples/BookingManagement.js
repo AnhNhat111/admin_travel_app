@@ -193,8 +193,8 @@ const Tables = () => {
                               </span>
                             </Media>
                           </th>
-                          <td>{bookings.user.name}</td>
-                          <td>{bookings.tour.map((x) => x.name)}</td>
+                          <td>{bookings.user?.name}</td>
+                          <td>{bookings.tour?.map((x) => x.name)}</td>
                           <td>{bookings.quantity_adult}</td>
                           <td>{bookings.quantity_child}</td>
                           <td>{bookings.quantity}</td>
